@@ -4,8 +4,10 @@ import TopicInput from "./components/TopicInput";
 import StudyDashboard from "./components/StudyDashboard";
 import FlashcardDeck from "./components/FlashcardDeck";
 import Quiz from "./components/Quiz";
+import ThemeToggle from "./components/ThemeToggle";
 
 import { useStudyGenerator } from "./hooks/useStudyGenerator";
+import { useTheme } from "./hooks/useTheme";
 
 import type { StudySet } from "./types/study";
 
@@ -16,13 +18,15 @@ type Page =
   | "quiz";
 
 function App() {
+  const { theme, toggleTheme } = useTheme();
+
   const [page, setPage] = useState<Page>("home");
 
   const [studySet, setStudySet] =
     useState<StudySet | null>(null);
 
   const [lastTopic, setLastTopic] =
-    useState("");  
+    useState("");
 
   const {
     generate,
@@ -31,106 +35,122 @@ function App() {
     clearError,
   } = useStudyGenerator();
 
-   const handleGenerate = async (topic: string) => {
-  setLastTopic(topic);
+  const handleGenerate = async (topic: string) => {
+    setLastTopic(topic);
 
-  const generatedStudySet =
-    await generate(topic);
+    const generatedStudySet =
+      await generate(topic);
 
-  if (!generatedStudySet) {
-    return;
-  }
+    if (!generatedStudySet) {
+      return;
+    }
 
-  setStudySet(generatedStudySet);
-  setPage("dashboard");
-};
+    setStudySet(generatedStudySet);
+    setPage("dashboard");
+  };
+
   const reset = () => {
     setStudySet(null);
     clearError();
     setPage("home");
   };
 
-  if (page === "home") {
-    return (
-      <>
-        <TopicInput
-          loading={loading}
-          onGenerate={handleGenerate}
+  const renderPage = () => {
+    if (page === "home") {
+      return (
+        <>
+          <TopicInput
+            loading={loading}
+            onGenerate={handleGenerate}
+          />
+
+          {error && (
+            <div
+              className="global-error"
+              role="alert"
+              aria-live="polite"
+            >
+              <strong>
+                We couldn't create your study set.
+              </strong>
+
+              <p>{error}</p>
+
+              <div className="error-actions">
+                {lastTopic && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleGenerate(lastTopic)
+                    }
+                    disabled={loading}
+                  >
+                    {loading
+                      ? "Retrying..."
+                      : "Try again"}
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className="error-dismiss"
+                  onClick={clearError}
+                  disabled={loading}
+                >
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    if (!studySet) {
+      return null;
+    }
+
+    if (page === "flashcards") {
+      return (
+        <FlashcardDeck
+          flashcards={studySet.flashcards}
+          onBack={() => setPage("dashboard")}
         />
+      );
+    }
 
-        {error && (
-  <div
-    className="global-error"
-    role="alert"
-    aria-live="polite"
-  >
-    <strong>
-      We couldn't create your study set.
-    </strong>
+    if (page === "quiz") {
+      return (
+        <Quiz
+          questions={studySet.quiz}
+          onBack={() => setPage("dashboard")}
+        />
+      );
+    }
 
-    <p>{error}</p>
-
-    <div className="error-actions">
-      {lastTopic && (
-        <button
-          type="button"
-          onClick={() =>
-            handleGenerate(lastTopic)
-          }
-          disabled={loading}
-        >
-          {loading ? "Retrying..." : "Try again"}
-        </button>
-      )}
-
-      <button
-        type="button"
-        className="error-dismiss"
-        onClick={clearError}
-        disabled={loading}
-      >
-        Dismiss
-      </button>
-    </div>
-  </div>
-)}
-      </>
-    );
-  }
-
-  if (!studySet) {
-    return null;
-  }
-
-  if (page === "flashcards") {
     return (
-      <FlashcardDeck
-        flashcards={studySet.flashcards}
-        onBack={() => setPage("dashboard")}
+      <StudyDashboard
+        studySet={studySet}
+        onStartFlashcards={() =>
+          setPage("flashcards")
+        }
+        onStartQuiz={() =>
+          setPage("quiz")
+        }
+        onReset={reset}
       />
     );
-  }
-
-  if (page === "quiz") {
-    return (
-      <Quiz
-        questions={studySet.quiz}
-        onBack={() => setPage("dashboard")}
-      />
-    );
-  }
+  };
 
   return (
-    <StudyDashboard
-      studySet={studySet}
-      onStartFlashcards={() =>
-        setPage("flashcards")
-      }
-      onStartQuiz={() =>
-        setPage("quiz")
-      }
-      onReset={reset}
-    />
+    <>
+      <ThemeToggle
+        theme={theme}
+        onToggle={toggleTheme}
+      />
+
+      {renderPage()}
+    </>
   );
 }
 
