@@ -2,15 +2,13 @@
 
 This is my submission for the Flam Frontend Internship assignment. I chose the **Study Assistant** option: the user provides a topic or a set of notes, and the app generates flashcards and a quiz they can actually interact with, rather than displaying raw AI text.
 
-I chose this option over the recipe and trip-planner alternatives because it allowed for genuine interaction loops — flipping cards, answering questions, and reviewing what was missed — rather than simply rendering a list.
+I chose this option over the recipe and trip-planner alternatives because it allowed for genuine interaction loops flipping cards, answering questions, and reviewing what was missed rather than simply rendering a list.
 
 ---
 
 ## Demo
 
-- **Live app:** []
-- **Demo video:** []
-- **GitHub:** []
+- **Demo video:** [https://drive.google.com/file/d/1hd8Ex9q3o8dEoLWXllvACoRrNZ7xsnPh/view?usp=sharing]
 
 ---
 
@@ -19,7 +17,7 @@ I chose this option over the recipe and trip-planner alternatives because it all
 The user enters a topic or pastes their notes, and the app generates:
 
 - A set of flashcards with a 3D flip animation, navigable via previous/next controls or the keyboard
-- A multiple-choice quiz with immediate feedback and an explanation after each answer
+- A multiple choice quiz with immediate feedback and an explanation after each answer
 - A results screen showing overall score, concepts answered correctly, and concepts that need review
 - The ability to retake the quiz without regenerating the study set
 
@@ -83,7 +81,7 @@ Flashcards are rendered as interactive components with a flip animation, previou
 
 ## Quiz
 
-The app records the full answer history for a session — the selected answer, whether it was correct, and the explanation for each question — rather than just a running score. This is what allows the results screen to show exactly which concepts were answered correctly and which need revision. The quiz can be retaken without regenerating a new study set.
+The app records the full answer history for a session the selected answer, whether it was correct, and the explanation for each question rather than just a running score. This is what allows the results screen to show exactly which concepts were answered correctly and which need revision. The quiz can be retaken without regenerating a new study set.
 
 ## Loading, error, and empty states
 
@@ -217,7 +215,7 @@ Response:
 
 ## AI usage note
 
-I used ChatGPT as a development assistant throughout this project — primarily for discussing implementation approaches, debugging TypeScript issues, reviewing validation and edge-case handling, and refining the Gemini prompt. I reviewed and tested every change in the context of my own project, and understand the code well enough to explain and extend it.
+I used ChatGPT as a development assistant throughout this project primarily for discussing implementation approaches, debugging TypeScript issues, reviewing validation and edge-case handling, and refining the Gemini prompt. I reviewed and tested every change in the context of my own project, and understand the code well enough to explain and extend it.
 
 The study content itself (flashcards and quiz questions) is generated at runtime by the Gemini API; it is not hardcoded or pre-written.
 
