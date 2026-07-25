@@ -5,18 +5,24 @@ import type { StudySet } from "../types/study";
 
 export function useStudyGenerator() {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const controllerRef = useRef<AbortController | null>(null);
+  const [error, setError] =
+    useState<string | null>(null);
+
+  const controllerRef =
+    useRef<AbortController | null>(null);
+
+  const requestIdRef = useRef(0);
 
   const generate = async (
     topic: string
   ): Promise<StudySet | null> => {
-    // Cancel any previous unfinished request.
     controllerRef.current?.abort();
 
     const controller = new AbortController();
     controllerRef.current = controller;
+
+    const requestId = ++requestIdRef.current;
 
     setLoading(true);
     setError(null);
@@ -27,6 +33,11 @@ export function useStudyGenerator() {
         controller.signal
       );
 
+      // Ignore a result belonging to an older request.
+      if (requestId !== requestIdRef.current) {
+        return null;
+      }
+
       return studySet;
     } catch (error) {
       if (
@@ -36,15 +47,17 @@ export function useStudyGenerator() {
         return null;
       }
 
-      setError(
-        error instanceof Error
-          ? error.message
-          : "Something went wrong while generating the study set."
-      );
+      if (requestId === requestIdRef.current) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again."
+        );
+      }
 
       return null;
     } finally {
-      if (controllerRef.current === controller) {
+      if (requestId === requestIdRef.current) {
         setLoading(false);
       }
     }

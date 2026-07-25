@@ -507,3 +507,19 @@ textarea:focus {
     padding: 20px;
   }
 }
+.error-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.global-error .error-dismiss {
+  background: transparent;
+  color: #6b3431;
+  border: 1px solid #d8aaa7;
+}
+
+.global-error button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

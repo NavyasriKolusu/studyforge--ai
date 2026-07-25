@@ -21,6 +21,9 @@ function App() {
   const [studySet, setStudySet] =
     useState<StudySet | null>(null);
 
+  const [lastTopic, setLastTopic] =
+    useState("");  
+
   const {
     generate,
     loading,
@@ -28,17 +31,19 @@ function App() {
     clearError,
   } = useStudyGenerator();
 
-  const handleGenerate = async (topic: string) => {
-    const generatedStudySet = await generate(topic);
+   const handleGenerate = async (topic: string) => {
+  setLastTopic(topic);
 
-    if (!generatedStudySet) {
-      return;
-    }
+  const generatedStudySet =
+    await generate(topic);
 
-    setStudySet(generatedStudySet);
-    setPage("dashboard");
-  };
+  if (!generatedStudySet) {
+    return;
+  }
 
+  setStudySet(generatedStudySet);
+  setPage("dashboard");
+};
   const reset = () => {
     setStudySet(null);
     clearError();
@@ -54,18 +59,41 @@ function App() {
         />
 
         {error && (
-          <div className="global-error">
-            <strong>
-              We couldn't create your study set.
-            </strong>
+  <div
+    className="global-error"
+    role="alert"
+    aria-live="polite"
+  >
+    <strong>
+      We couldn't create your study set.
+    </strong>
 
-            <p>{error}</p>
+    <p>{error}</p>
 
-            <button onClick={clearError}>
-              Dismiss
-            </button>
-          </div>
-        )}
+    <div className="error-actions">
+      {lastTopic && (
+        <button
+          type="button"
+          onClick={() =>
+            handleGenerate(lastTopic)
+          }
+          disabled={loading}
+        >
+          {loading ? "Retrying..." : "Try again"}
+        </button>
+      )}
+
+      <button
+        type="button"
+        className="error-dismiss"
+        onClick={clearError}
+        disabled={loading}
+      >
+        Dismiss
+      </button>
+    </div>
+  </div>
+)}
       </>
     );
   }
