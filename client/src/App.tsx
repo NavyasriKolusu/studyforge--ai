@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import GenerationLoader from "./components/GenerationLoader";
 import TopicInput from "./components/TopicInput";
 import StudyDashboard from "./components/StudyDashboard";
 import FlashcardDeck from "./components/FlashcardDeck";
@@ -63,6 +63,7 @@ function App() {
             loading={loading}
             onGenerate={handleGenerate}
           />
+          {loading && <GenerationLoader />}
 
           {error && (
             <div
