@@ -16,7 +16,7 @@ app.use(
 app.use(express.json({ limit: "1mb" }));
 
 app.get("/api/health", (_request, response) => {
-  response.json({
+  response.status(200).json({
     status: "ok",
     service: "StudyForge API",
   });

@@ -35,7 +35,6 @@ export const quizQuestionSchema = z
 
 export const studySetSchema = z.object({
   title: z.string().min(1),
-
   summary: z.string().min(1),
 
   flashcards: z
