@@ -5,7 +5,7 @@ import StudyDashboard from "./components/StudyDashboard";
 import FlashcardDeck from "./components/FlashcardDeck";
 import Quiz from "./components/Quiz";
 
-import { mockStudySet } from "./data/mockStudySet";
+import { useStudyGenerator } from "./hooks/useStudyGenerator";
 
 import type { StudySet } from "./types/study";
 
@@ -18,41 +18,55 @@ type Page =
 function App() {
   const [page, setPage] = useState<Page>("home");
 
-  const [loading, setLoading] = useState(false);
-
   const [studySet, setStudySet] =
     useState<StudySet | null>(null);
 
+  const {
+    generate,
+    loading,
+    error,
+    clearError,
+  } = useStudyGenerator();
+
   const handleGenerate = async (topic: string) => {
-    setLoading(true);
+    const generatedStudySet = await generate(topic);
 
-    console.log("Generating:", topic);
-
-    try {
-      // Temporary delay.
-      // Later this becomes the real AI API request.
-      await new Promise((resolve) =>
-        setTimeout(resolve, 1200)
-      );
-
-      setStudySet(mockStudySet);
-      setPage("dashboard");
-    } finally {
-      setLoading(false);
+    if (!generatedStudySet) {
+      return;
     }
+
+    setStudySet(generatedStudySet);
+    setPage("dashboard");
   };
 
   const reset = () => {
     setStudySet(null);
+    clearError();
     setPage("home");
   };
 
   if (page === "home") {
     return (
-      <TopicInput
-        loading={loading}
-        onGenerate={handleGenerate}
-      />
+      <>
+        <TopicInput
+          loading={loading}
+          onGenerate={handleGenerate}
+        />
+
+        {error && (
+          <div className="global-error">
+            <strong>
+              We couldn't create your study set.
+            </strong>
+
+            <p>{error}</p>
+
+            <button onClick={clearError}>
+              Dismiss
+            </button>
+          </div>
+        )}
+      </>
     );
   }
 
@@ -84,7 +98,9 @@ function App() {
       onStartFlashcards={() =>
         setPage("flashcards")
       }
-      onStartQuiz={() => setPage("quiz")}
+      onStartQuiz={() =>
+        setPage("quiz")
+      }
       onReset={reset}
     />
   );
