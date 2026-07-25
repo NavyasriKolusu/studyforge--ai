@@ -15,57 +15,102 @@ const ai = new GoogleGenAI({
 export async function generateStudySet(
   topic: string
 ): Promise<unknown> {
-  const prompt = `
-You are the content generation engine for an interactive study application.
+    const prompt = `
+You are the study-content engine for StudyForge, an interactive
+AI-powered learning application.
 
-Create a study set from the user's topic or notes.
+Act as an expert university professor and technical interviewer.
 
-USER INPUT:
+The learner wants to study the following topic or notes:
+
+"""
 ${topic}
+"""
+
+Create a high-quality study set based on the learner's input.
+
+CONTENT GOALS:
+
+1. Focus on conceptual understanding rather than simple memorization.
+
+2. Identify the most important concepts from the topic.
+
+3. When the topic is technical, include questions that are useful
+   for university exams and technical interviews.
+
+4. Include common misconceptions, differences between related
+   concepts, or common mistakes when relevant.
+
+5. Start with foundational concepts and gradually include
+   intermediate or applied concepts.
+
+6. Keep flashcard answers concise but educational.
+
+7. Quiz explanations must teach the learner why the selected
+   answer is correct.
+
+8. Avoid repetitive or nearly identical questions.
+
+9. Stay relevant to the learner's requested topic.
+
+10. Do not invent specific facts that are unsupported when the
+    learner provides detailed notes.
 
 Return ONLY valid JSON.
 
 The JSON must have exactly this structure:
 
 {
-  "title": "Short study set title",
-  "summary": "One or two sentence summary",
+  "title": "Concise study set title",
+
+  "summary": "A useful 1-2 sentence overview of the topic",
+
   "flashcards": [
     {
       "id": "flash-1",
-      "question": "Question",
-      "answer": "Clear concise answer"
+      "question": "Clear study question",
+      "answer": "Concise educational answer"
     }
   ],
+
   "quiz": [
     {
       "id": "quiz-1",
-      "question": "Question",
+      "question": "Quiz question",
+
       "options": [
         "Option A",
         "Option B",
         "Option C",
         "Option D"
       ],
+
       "correctAnswer": 0,
-      "explanation": "Why the answer is correct"
+
+      "explanation":
+        "A concise explanation of why this answer is correct"
     }
   ]
 }
 
-Rules:
+STRICT REQUIREMENTS:
 
-- Generate between 5 and 10 flashcards.
-- Generate between 5 and 10 quiz questions.
-- Each quiz question must have exactly 4 options.
-- correctAnswer is a zero-based array index.
+- Generate between 7 and 10 flashcards.
+- Generate between 7 and 10 quiz questions.
+- Every flashcard must contain a meaningful question and answer.
+- Every quiz question must contain exactly 4 options.
+- Exactly one option must be correct.
+- correctAnswer must be the zero-based index of the correct option.
 - correctAnswer must therefore be 0, 1, 2, or 3.
-- Questions must be based only on the supplied topic or notes.
-- Keep explanations concise but educational.
+- Every quiz question must include an explanation.
+- Flashcard questions must not be duplicates.
+- Quiz questions must not be duplicates.
+- Options within a quiz question must not be duplicates.
 - IDs must be unique.
-- Do not include markdown.
-- Do not include code fences.
-- Do not include commentary before or after the JSON.
+- Do not output Markdown.
+- Do not use code fences.
+- Do not include commentary before the JSON.
+- Do not include commentary after the JSON.
 `;
 
   const response = await ai.models.generateContent({
